@@ -23,3 +23,12 @@ storefront/settings.py
 
 # VS Code
 .vscode/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# pytest / coverage
+.coverage
+htmlcov/
+.pytest_cache/
