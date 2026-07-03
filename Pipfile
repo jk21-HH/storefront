@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 django = "*"
 psycopg2-binary = "*"
+faker = "*"
+django-debug-toolbar = "*"
 
 [dev-packages]
 
