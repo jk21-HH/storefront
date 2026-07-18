@@ -1,5 +1,9 @@
+from decimal import Decimal
+
 from django.db import models
 from django.core.validators import MinValueValidator
+
+from uuid import uuid4
 
 class Promotion(models.Model):
     description = models.CharField(max_length=255)
@@ -39,8 +43,13 @@ class Product(models.Model):
     def __str__(self) -> str:
         return self.title
     
+    
     class Meta:
         ordering = ['title']
+
+    @property
+    def price_with_tax(self):
+        return (self.unit_price * Decimal('1.18')).quantize(Decimal('0.01'))
 
 class Customer(models.Model):
     MEMBERSHIP_BRONZE = 'B'
@@ -96,12 +105,16 @@ class Address(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.PROTECT) 
 
 class Cart(models.Model):
+    id = models.UUIDField(primary_key=True, default=uuid4)
     created_at = models.DateTimeField(auto_now_add=True)
 
 class CartItem(models.Model):
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = [['cart', 'product']]
 
 class Review(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='reviews')

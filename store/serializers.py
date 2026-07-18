@@ -1,20 +1,14 @@
 from rest_framework import serializers
 from decimal import Decimal
 
-from store.models import Product, Collection, Review
+from store.models import Cart, CartItem, Product, Collection, Review
 
 class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
         fields = ['id', 'title', 'description', 'slug', 'inventory', 'unit_price', 'price_with_tax', 'collection', 'collection_title']
     
-    price_with_tax = serializers.SerializerMethodField(method_name='calculate_tax')
     collection_title = serializers.CharField(source='collection.title', read_only=True)
-
-    def calculate_tax(self, product: Product) -> float:
-        return product.unit_price * Decimal('1.18')
-        
-
 
 class CollectionSerializer(serializers.ModelSerializer):
     class Meta:
@@ -31,6 +25,39 @@ class ReviewSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         product_id = self.context['product_id']
         return Review.objects.create(product_id=product_id, **validated_data)
+
+class BasicProductSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ['id', 'title', 'unit_price', 'price_with_tax']
+
+class CartItemSerializer(serializers.ModelSerializer):
+    product = BasicProductSerializer()
+   
+    class Meta:
+        model = CartItem
+        fields = ['id', 'product', 'quantity', 'total_price']
+
+    total_price = serializers.SerializerMethodField(method_name='get_total_price')
+
+    def get_total_price(self, cart_item: CartItem) -> float:
+        return cart_item.quantity * cart_item.product.price_with_tax
+    
+class CartSerializer(serializers.ModelSerializer):
+    id = serializers.UUIDField(read_only=True)
+    items = CartItemSerializer(many=True, read_only=True)
+    total_price = serializers.SerializerMethodField(method_name='get_total_price')
+
+    class Meta:
+        model = Cart
+        fields = ['id', 'items', 'total_price']
+
+    def get_total_price(self, cart: Cart) -> float:
+        return sum([item.quantity * item.product.price_with_tax for item in cart.items.all()])
+
+
+
+    
 
 
     
