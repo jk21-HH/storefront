@@ -2,8 +2,6 @@ from django.urls import include, path
 from rest_framework_nested import routers
 from . import views
 
-# URLConf for playground app
-
 router = routers.DefaultRouter()
 
 router.register('products', views.ProductViewSet, basename='products')
@@ -15,7 +13,13 @@ products_router.register(
     'reviews', views.ReviewViewSet, basename='product-reviews'
 )
 
+cart_router = routers.NestedDefaultRouter(router, 'carts', lookup='cart')
+cart_router.register(
+  'items', views.CartItemViewSet, basename='cart-items'
+)
+
 urlpatterns = [
     path(r'', include(router.urls)),
     path(r'', include(products_router.urls)),
+    path(r'', include(cart_router.urls)),
 ]
