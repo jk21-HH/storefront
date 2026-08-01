@@ -11,18 +11,25 @@ ALLOWED_HOSTS = []
 
 INSTALLED_APPS = [
     'django.contrib.admin',
+    'django.contrib.sessions',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_filters',
     'rest_framework',
+    'debug_toolbar',
+    'djoser',
+    'playground',
     'store',
     'tags',
     'likes',
+    'core',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -78,7 +85,13 @@ STATIC_URL = 'static/'
 INTERNAL_IPS = ['127.0.0.1']
 
 REST_FRAMEWORK = {
-  'COERCE_DECIMAL_TO_STRING': False,
-#   'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
-#   'PAGE_SIZE': 10
+    'COERCE_DECIMAL_TO_STRING': False,
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+            'rest_framework_simplejwt.authentication.JWTAuthentication',
+        ),
+}
+
+AUTH_USER_MODEL = 'core.User'
+SIMPLE_JWT = {
+    'AUTH_HEADER_TYPES': ('JWT',),
 }
