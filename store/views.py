@@ -116,6 +116,4 @@ class CustomerViewSet(ModelViewSet):
     @action(detail=True, permission_classes=[ViewCustomerHistoryPermission])
     def history(self, request, pk):
         return Response({'message': 'ok'})
-        if not request.user.has_perm('store.view_history'):
-            return Response(status=status.HTTP_403_FORBIDDEN)
         
